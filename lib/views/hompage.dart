@@ -7,8 +7,9 @@ import 'package:mynotes/views/verify_email.dart';
 import '../firebase_options.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+  HomePage({Key? key}) : super(key: key);
   static const id = 'homepage';
+  final _auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -18,18 +19,16 @@ class HomePage extends StatelessWidget {
       builder: (context, snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.done:
-            final user = FirebaseAuth.instance.currentUser;
+            final user = _auth.currentUser;
             if (user != null) {
               if (user.emailVerified) {
                 return const Verifyemail();
               } else {
-                
                 return const NoteView();
               }
             } else {
               return const LoginView();
             }
-
 
           default:
             return const CircularProgressIndicator();
