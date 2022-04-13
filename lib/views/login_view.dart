@@ -1,11 +1,14 @@
 // ignore_for_file: file_names, unused_import
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mynotes/services/auth/auth_exceptions.dart';
+import 'package:mynotes/services/auth_service.dart';
+
 import 'package:mynotes/views/register_view.dart';
 import 'package:mynotes/views/verify_email.dart';
 import 'dart:developer' as devtools show log;
 import '../main.dart';
 import '../utilities/dialogs.dart';
+import 'note_views.dart';
 
 class LoginView extends StatefulWidget {
   static const id = 'Login';
@@ -18,7 +21,8 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
-  final _auth = FirebaseAuth.instance;
+
+  final auth = AuthService.firebase();
 
   @override
   void initState() {
@@ -59,43 +63,34 @@ class _LoginViewState extends State<LoginView> {
               final email = _email.text;
               final password = _password.text;
               try {
-                final userCredential = await _auth.signInWithEmailAndPassword(
+                final userCredential = await auth.logIn(
                   email: email,
                   password: password,
                 );
-                final user = _auth.currentUser;
-                if (user?.emailVerified ?? false) {
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    NoteView.id,
-                    (route) => false,
-                  );
+                final user = auth.currentUser;
+                if (user?.isEmailVerified ?? false) {
+                  Navigator.of(context)
+                      .pushNamedAndRemoveUntil(NoteView.id, (route) => false);
                 } else {
                   Navigator.of(context).pushNamedAndRemoveUntil(
                     Verifyemail.id,
                     (route) => false,
                   );
                 }
-              } on FirebaseAuthException catch (e) {
-                if (e.code == 'user-not-found') {
-                  await showErrorDialog(
-                    context,
-                    'User not found',
-                  );
-                } else if (e.code == 'wrong-password') {
-                  await showErrorDialog(
-                    context,
-                    'Wrong password',
-                  );
-                } else {
-                  await showErrorDialog(
-                    context,
-                    'Error: ${e.code}',
-                  );
-                }
-              } catch (e) {
+              } on UserNotFoundAuthException {
                 await showErrorDialog(
                   context,
-                  e.toString(),
+                  'User not found',
+                );
+              } on WrongPasswordAuthException {
+                await showErrorDialog(
+                  context,
+                  'Wrong password',
+                );
+              } on GenericAuthException {
+                await showErrorDialog(
+                  context,
+                  'Authentication error',
                 );
               }
             },
