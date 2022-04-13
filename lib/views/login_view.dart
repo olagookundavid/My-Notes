@@ -63,7 +63,7 @@ class _LoginViewState extends State<LoginView> {
               final email = _email.text;
               final password = _password.text;
               try {
-                final userCredential = await auth.logIn(
+                await auth.logIn(
                   email: email,
                   password: password,
                 );
@@ -94,7 +94,9 @@ class _LoginViewState extends State<LoginView> {
                 );
               }
             },
-            child: const Text("Login"),
+            child: const Text(
+              "Login",
+            ),
           ),
           TextButton(
             onPressed: () {
