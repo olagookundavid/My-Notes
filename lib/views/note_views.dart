@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mynotes/services/auth_service.dart';
+import 'package:mynotes/services/crud/notes_service.dart';
 import '../enums/menu_action.dart';
 import '../utilities/dialogs.dart';
 import 'login_view.dart';
@@ -12,7 +13,19 @@ class NoteView extends StatefulWidget {
 }
 
 class _NoteViewState extends State<NoteView> {
-  final auth = AuthService.firebase();
+  late final NoteService _noteService;
+  String get userEmail => AuthService.firebase().currentUser!.email!;
+  @override
+  void initState() {
+    _noteService = NoteService();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _noteService.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +40,8 @@ class _NoteViewState extends State<NoteView> {
                   final shouldlogout = await showLogOutDialog(context);
 
                   if (shouldlogout) {
-                    await auth.logOut();
+                    // await auth.logOut();
+
                     Navigator.of(context).pushNamedAndRemoveUntil(
                         LoginView.id, (route) => false);
                   }
@@ -43,6 +57,30 @@ class _NoteViewState extends State<NoteView> {
             },
           )
         ],
+      ),
+      body: FutureBuilder(
+        future: _noteService.getOrcreateUser(
+          email: userEmail,
+        ),
+        builder: ((context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.done:
+              return StreamBuilder(
+                stream: _noteService.allNotes,
+                builder: ((context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.waiting:
+                    // TODO: Handle this case.
+                    default:
+                      return CircularProgressIndicator();
+                  }
+                }),
+              );
+
+            default:
+              return const CircularProgressIndicator();
+          }
+        }),
       ),
     );
   }
