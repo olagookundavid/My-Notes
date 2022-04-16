@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:mynotes/views/notes/new_notes_view.dart';
 import 'package:mynotes/views/verify_email.dart';
 import 'views/hompage.dart';
 import 'views/Login_view.dart';
-import 'views/note_views.dart';
+import 'views/notes/note_views.dart';
 import 'views/register_view.dart ';
 
 void main() async {
@@ -21,6 +22,7 @@ void main() async {
         HomePage.id: (context) => HomePage(),
         NoteView.id: (context) => const NoteView(),
         Verifyemail.id: (context) => const Verifyemail(),
+        NewNoteView.id: (context) => const NewNoteView(),
       },
     ),
   );

@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' show join;
@@ -47,11 +46,17 @@ class NoteService {
   Database? _db;
   List<DataBaseNotes> _notes = [];
   static final NoteService _shared = NoteService._sharedInstance();
-  NoteService._sharedInstance();
+  NoteService._sharedInstance() {
+    _notesStreamController =
+        StreamController<List<DataBaseNotes>>.broadcast(onListen: () {
+      _notesStreamController.sink.add(
+        _notes,
+      );
+    });
+  }
   factory NoteService() => _shared;
 
-  final _notesStreamController =
-      StreamController<List<DataBaseNotes>>.broadcast();
+  late final StreamController<List<DataBaseNotes>> _notesStreamController;
 
   Future<void> _cacheNotes() async {
     final allNotes = await getAllNote();

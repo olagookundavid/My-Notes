@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mynotes/services/auth_service.dart';
 import 'package:mynotes/views/login_view.dart';
 import 'package:mynotes/views/verify_email.dart';
-import 'note_views.dart';
+import 'notes/note_views.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({Key? key}) : super(key: key);
