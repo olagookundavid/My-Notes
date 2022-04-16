@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mynotes/services/auth_service.dart';
 import 'package:mynotes/services/crud/notes_service.dart';
-import 'package:mynotes/views/notes/new_notes_view.dart';
+import 'package:mynotes/views/notes/create_update_note_view.dart';
 import 'package:mynotes/views/notes/note_list_view.dart';
 import '../../enums/menu_action.dart';
 import '../../utilities/logout_dialog.dart';
@@ -31,7 +31,7 @@ class _NoteViewState extends State<NoteView> {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, NewNoteView.id);
+              Navigator.pushNamed(context, createUpdateNoteView.id);
             },
             icon: const Icon(Icons.add),
           ),
@@ -76,10 +76,18 @@ class _NoteViewState extends State<NoteView> {
                       if (snapshot.hasData) {
                         final allNotes = snapshot.data as List<DataBaseNotes>;
                         return NotesListView(
-                            notes: allNotes,
-                            onDeleteNote: (note) async {
-                              await _noteService.deleteNote(id: note.id);
-                            });
+                          notes: allNotes,
+                          onDeleteNote: (note) async {
+                            await _noteService.deleteNote(id: note.id);
+                          },
+                          onTap: (note) {
+                            Navigator.pushNamed(
+                              context,
+                              createUpdateNoteView.id,
+                              arguments: note,
+                            );
+                          },
+                        );
                       } else {
                         return const CircularProgressIndicator();
                       }

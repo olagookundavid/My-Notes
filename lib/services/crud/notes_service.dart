@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:mynotes/extensions/list/filter.dart';
+import 'package:mynotes/services/auth/auth_exceptions.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' show join;
@@ -45,6 +47,7 @@ class DataBaseNotes {
 class NoteService {
   Database? _db;
   List<DataBaseNotes> _notes = [];
+  DataBaseUser? _user;
   static final NoteService _shared = NoteService._sharedInstance();
   NoteService._sharedInstance() {
     _notesStreamController =
@@ -257,10 +260,8 @@ class NoteService {
     await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     await getNote(id: note.id);
-    final updatesCount = await db.update(
-      noteTable,
-      {textColumn: text},
-    );
+    final updatesCount = await db.update(noteTable, {textColumn: text},
+        where: 'id = ?', whereArgs: [note.id]);
     if (updatesCount == 0) {
       throw CouldNotUpdateNote();
     } else {
@@ -274,14 +275,30 @@ class NoteService {
     }
   }
 
-  Stream<List<DataBaseNotes>> get allNotes => _notesStreamController.stream;
+  Stream<List<DataBaseNotes>> get allNotes =>
+      _notesStreamController.stream.filter(
+        (note) {
+          final currentUser = _user;
+          if (currentUser != null) {
+            return note.userId == currentUser.id;
+          } else {
+            throw UserShouldBeSetbeforeReadingAllNotes();
+          }
+        },
+      );
 
-  Future<DataBaseUser> getOrcreateUser({required String email}) async {
+  Future<DataBaseUser> getOrcreateUser({
+    required String email,
+    bool setAsCurrentUser = true,
+  }) async {
     try {
       final user = await getUser(email: email);
       return user;
     } on CouldNotFindUser {
       final createdUser = await createUser(email: email);
+      if (setAsCurrentUser) {
+        _user = createdUser;
+      }
       return createdUser;
     } catch (e) {
       rethrow;
