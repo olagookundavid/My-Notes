@@ -3,7 +3,7 @@ import 'package:mynotes/views/Login_view.dart';
 import 'package:mynotes/views/verify_email.dart';
 import '../services/auth/auth_exceptions.dart';
 import '../services/auth_service.dart';
-import '../utilities/dialogs.dart';
+import '../utilities/error_dialog.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);

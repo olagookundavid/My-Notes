@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:mynotes/services/auth_service.dart';
 import 'package:mynotes/services/crud/notes_service.dart';
 import 'package:mynotes/views/notes/new_notes_view.dart';
+import 'package:mynotes/views/notes/note_list_view.dart';
 import '../../enums/menu_action.dart';
-import '../../utilities/dialogs.dart';
+import '../../utilities/logout_dialog.dart';
 import '../login_view.dart';
 
 class NoteView extends StatefulWidget {
@@ -38,7 +39,7 @@ class _NoteViewState extends State<NoteView> {
             onSelected: (value) async {
               switch (value) {
                 case MenuAction.logout:
-                  final shouldlogout = await showLogOutDialog(context);
+                  final shouldlogout = await showLogoutDialog(context);
 
                   if (shouldlogout) {
                     // await auth.logOut();
@@ -74,20 +75,11 @@ class _NoteViewState extends State<NoteView> {
                     case ConnectionState.active:
                       if (snapshot.hasData) {
                         final allNotes = snapshot.data as List<DataBaseNotes>;
-                        return ListView.builder(
-                          itemBuilder: (context, index) {
-                            final note = allNotes[index];
-                            return ListTile(
-                              title: Text(
-                                note.text,
-                                maxLines: 1,
-                                softWrap: true,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            );
-                          },
-                          itemCount: allNotes.length,
-                        );
+                        return NotesListView(
+                            notes: allNotes,
+                            onDeleteNote: (note) async {
+                              await _noteService.deleteNote(id: note.id);
+                            });
                       } else {
                         return const CircularProgressIndicator();
                       }

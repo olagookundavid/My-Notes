@@ -8,6 +8,7 @@ import 'package:mynotes/views/verify_email.dart';
 import 'dart:developer' as devtools show log;
 import '../main.dart';
 import '../utilities/dialogs.dart';
+import '../utilities/error_dialog.dart';
 import 'notes/note_views.dart';
 
 class LoginView extends StatefulWidget {
