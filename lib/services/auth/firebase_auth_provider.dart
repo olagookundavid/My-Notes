@@ -10,11 +10,15 @@ final _auth = FirebaseAuth.instance;
 
 class FireBaseAuthProvider implements AuthProvider {
   @override
-  Future<AuthUser> createUser(
-      {required String email, required String password}) async {
+  Future<AuthUser> createUser({
+    required String email,
+    required String password,
+  }) async {
     try {
       await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
+        email: email,
+        password: password,
+      );
       final user = currentUser;
       if (user != null) {
         return user;
@@ -47,8 +51,10 @@ class FireBaseAuthProvider implements AuthProvider {
   }
 
   @override
-  Future<AuthUser> logIn(
-      {required String email, required String password}) async {
+  Future<AuthUser> logIn({
+    required String email,
+    required String password,
+  }) async {
     try {
       await _auth.signInWithEmailAndPassword(
         email: email,
@@ -85,7 +91,7 @@ class FireBaseAuthProvider implements AuthProvider {
 
   @override
   Future<void> sendEmailVerification() async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _auth.currentUser;
     if (user != null) {
       await user.sendEmailVerification();
     } else {
