@@ -1,3 +1,3 @@
 # mynotes
 
-A Note App created with Vandad
+A Note App created to help manage users notes
